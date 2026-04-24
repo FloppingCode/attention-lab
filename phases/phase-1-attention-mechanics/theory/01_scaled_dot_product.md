@@ -40,20 +40,15 @@ In self-attention, $Q, K, V$ come from the same input $X \in \mathbb{R}^{n \time
 
 **Proposition 1.2 (Permutation equivariance over sources).** For any $m \times m$ permutation matrix $P$,
 $$\text{Attention}(Q, PK, PV) = \text{Attention}(Q, K, V).$$
+*Sketch: row-permutation equivariance of softmax plus $P^\top P = I$.* (Direct verification.)
 
-**Proof.** Score matrix: $Q(PK)^\top = QK^\top P^\top$. Softmax is equivariant to coordinate permutation on each row, so $\text{softmax}(QK^\top P^\top / \sqrt{d_k}) = \text{softmax}(QK^\top / \sqrt{d_k})\, P^\top$. Multiply by $PV$: $\text{softmax}(\cdot)\, P^\top P\, V = \text{softmax}(\cdot)\, V$ since $P^\top P = I$. $\blacksquare$
-
-**Corollary 1.2.1.** Self-attention is permutation-equivariant under token reordering: permuting the rows of $X$ permutes the rows of the output by the same permutation. Positional information must therefore be injected *before* attention (Chapter 6).
+**Corollary 1.2.1.** Self-attention is permutation-equivariant under token reordering. Positional information must therefore be injected *before* attention (Chapter 6).
 
 **Proposition 1.3 (Convex-hull containment).** Each output row $\mathbf{o}_i$ lies in the convex hull of $\{\mathbf{v}_1, \dots, \mathbf{v}_m\}$.
 
-**Proof.** $\alpha_{ij} \ge 0$ and $\sum_j \alpha_{ij} = 1$ by construction of softmax. $\mathbf{o}_i = \sum_j \alpha_{ij} \mathbf{v}_j$ is a convex combination. $\blacksquare$
-
 **Corollary 1.3.1.** For every coordinate $k$, $\min_j V_{jk} \le (\mathbf{o}_i)_k \le \max_j V_{jk}$. Attention cannot extrapolate beyond the value range — a sharp, often overlooked constraint.
 
-**Proposition 1.4 (Smoothness).** $\text{Attention}(Q, K, V)$ is $C^\infty$ in $Q, K, V$, hence admits gradients everywhere.
-
-**Proof.** Softmax is $C^\infty$ (composition of $\exp$ and rational), matrix products are polynomial, composition of $C^\infty$ maps is $C^\infty$. $\blacksquare$
+**Proposition 1.4 (Smoothness).** $\text{Attention}(Q, K, V)$ is $C^\infty$ in $Q, K, V$, hence admits gradients everywhere. (Composition of smooth maps; the failure of this property for hard attention is what makes Exercise 1.4 interesting.)
 
 ## 1.4 Numerical example — $d_k = d_v = 2, n = m = 2$ by hand
 

@@ -28,28 +28,19 @@ Dividing by $\sqrt{d_k}$ rescales the first link so pre-softmax inputs have unit
 
 **Lemma 3.1 (Variance of an inner product).** Let $q, k \in \mathbb{R}^{d_k}$ have independent components $q_i, k_i$ with $\mathbb{E}[q_i] = \mathbb{E}[k_i] = 0$ and $\text{Var}(q_i) = \text{Var}(k_i) = 1$, and $q \perp k$ as random vectors. Then
 $$\mathbb{E}[\langle q, k \rangle] = 0, \qquad \text{Var}(\langle q, k \rangle) = d_k.$$
-
-**Proof.** Mean is linearity of expectation and independence: $\mathbb{E}[\sum_i q_i k_i] = \sum_i \mathbb{E}[q_i]\mathbb{E}[k_i] = 0$. For the variance,
-$$\text{Var}\!\left(\sum_i q_i k_i\right) = \sum_i \text{Var}(q_i k_i) = \sum_i \mathbb{E}[q_i^2 k_i^2] = \sum_i \mathbb{E}[q_i^2]\,\mathbb{E}[k_i^2] = d_k,$$
-where the cross terms $\text{Cov}(q_i k_i, q_j k_j) = 0$ for $i \ne j$ by independence of the four variables involved. $\blacksquare$
+*Sketch: mean by independence; variance by independence across $i$ and the factoring $\mathbb{E}[q_i^2 k_i^2] = \mathbb{E}[q_i^2]\mathbb{E}[k_i^2] = 1$. Generalized in Exercise 3.1.*
 
 **Proposition 3.2 (The $\sqrt{d_k}$ correction).** Under the hypotheses of Lemma 3.1, $\text{Var}(\langle q, k \rangle / \sqrt{d_k}) = 1$.
 
-**Lemma 3.3 (Jacobian vanishing under saturation).** Let $p = \text{softmax}(s)$ for $s \in \mathbb{R}^n$. Let $J_{ij} = \partial p_i / \partial s_j = p_i(\delta_{ij} - p_j)$. If $p \to e_k$ (one-hot at index $k$), then $\|J\|_F \to 0$.
-
-**Proof.** For $i \ne k$, $p_i \to 0$ so $J_{ij} \to 0$ for all $j$. For $i = k$, $J_{kj} = \delta_{kj} - p_j$, and since $p_j \to \delta_{kj}$ we have $J_{kj} \to 0$. Every entry vanishes, so does the Frobenius norm. $\blacksquare$
+**Lemma 3.3 (Jacobian vanishing under saturation).** Let $p = \text{softmax}(s)$ for $s \in \mathbb{R}^n$. Let $J_{ij} = \partial p_i / \partial s_j = p_i(\delta_{ij} - p_j)$. If $p \to e_k$ (one-hot at index $k$), then $\|J\|_F \to 0$. *Sketch: case-split on $i = k$ vs. $i \ne k$ — every entry vanishes individually.*
 
 **Corollary 3.3.1.** Pre-softmax scores with standard deviation $\sqrt{d_k}$ place softmax in the saturating regime (Chapter 2, §2.4); combined with Lemma 3.3, this means gradients at $W_Q, W_K$ through an unscaled attention layer vanish in expectation as $d_k \to \infty$ at initialization.
 
 **Empirical observation 3.4 (The i.i.d. hypothesis breaks post-training).** In a trained model the entries of $q, k$ are not i.i.d. — learned $W_Q, W_K$ concentrate mass in specific directions dictated by the task. Pre-softmax score variance in trained attention is typically *below* one even with the $\sqrt{d_k}$ factor present. The scaling argument is sharp at init; after training it is conservative. This motivates alternatives like QK-norm (Exercise 3.3) that do not depend on the i.i.d. hypothesis.
 
-## 3.4 Numerical example — $d_k = 4$ by hand, then Monte-Carlo
+## 3.4 Numerical example — variance scaling is a distributional fact
 
-**Hand computation.** Take $q = (1, -1, 1, 1)^\top / 2$, $k_1 = (1, 1, 1, 1)^\top / 2$, $k_2 = (1, 1, -1, 1)^\top / 2$. Each is a unit vector.
-$$\langle q, k_1 \rangle = \tfrac{1}{4}(1 - 1 + 1 + 1) = \tfrac{1}{2}, \qquad \langle q, k_2 \rangle = \tfrac{1}{4}(1 - 1 - 1 + 1) = 0.$$
-These scores are already order one, but that is because we picked one sample. Lemma 3.1 is a statement about the *distribution*.
-
-**Monte-Carlo check (inline).** Sample $M$ independent $(q, k)$ pairs with i.i.d. $\mathcal{N}(0, 1)$ entries and compute the empirical variance of $\langle q, k \rangle$:
+A single hand computation of $\langle q, k \rangle$ for fixed $q, k$ doesn't surface what Lemma 3.1 is saying — the lemma is about the *distribution* of the inner product across i.i.d. samples, not any particular value. The minimal experiment that reveals the mechanism is a Monte-Carlo estimate of the variance across $d_k$:
 
 ```python
 import numpy as np

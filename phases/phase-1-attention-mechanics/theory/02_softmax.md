@@ -37,27 +37,19 @@ Softmax does one job with four useful consequences.
 $$\text{softmax}_T(s)_i = \frac{e^{s_i / T}}{\sum_{j=1}^n e^{s_j / T}}.$$
 We write $\text{softmax}(s) := \text{softmax}_1(s)$ for the unit-temperature default.
 
-**Proposition 2.2 (Shift invariance).** For any $c \in \mathbb{R}$, $\text{softmax}_T(s + c \mathbf{1}) = \text{softmax}_T(s)$.
-
-**Proof.** $e^{(s_i + c)/T} = e^{c/T} e^{s_i/T}$; the constant factors out of both numerator and normalizer. $\blacksquare$
+**Proposition 2.2 (Shift invariance).** For any $c \in \mathbb{R}$, $\text{softmax}_T(s + c \mathbf{1}) = \text{softmax}_T(s)$. (The constant $e^{c/T}$ factors out of numerator and denominator.)
 
 **Proposition 2.3 (Jacobian).** Let $p = \text{softmax}(s)$. Then
 $$\frac{\partial p_i}{\partial s_j} = p_i(\delta_{ij} - p_j).$$
-For $\text{softmax}_T$, the Jacobian is $\tfrac{1}{T} p_i(\delta_{ij} - p_j)$.
+For $\text{softmax}_T$, the Jacobian is $\tfrac{1}{T} p_i(\delta_{ij} - p_j)$. *Quotient rule, case-split on $i = j$.*
 
-**Proof.** For $i = j$: $\partial_{s_i} (e^{s_i}/Z) = e^{s_i}/Z - e^{s_i} e^{s_i}/Z^2 = p_i - p_i^2 = p_i(1 - p_i)$. For $i \ne j$: $\partial_{s_j} (e^{s_i}/Z) = -e^{s_i} e^{s_j}/Z^2 = -p_i p_j$. Combine. The temperature rescaling is chain rule on $s \mapsto s/T$. $\blacksquare$
+**Corollary 2.3.1 (Mass conservation).** The rows and columns of the Jacobian each sum to zero: $\sum_i \partial p_i / \partial s_j = 0$. *Why:* softmax maps to the simplex, so $\sum_i p_i = 1$ is constant; any perturbation in $s_j$ preserves this.
 
-**Corollary 2.3.1 (Mass conservation).** The columns and rows of the Jacobian each sum to zero: $\sum_i \partial p_i / \partial s_j = 0$. *Why:* softmax maps to the simplex, so $\sum_i p_i = 1$ is constant; any perturbation in $s_j$ preserves this, meaning mass leaving one $p_i$ enters others in equal total amount.
-
-**Proposition 2.4 (Entropy bounds).** For $p = \text{softmax}(s)$, $H(p) = -\sum_i p_i \log p_i \in [0, \log n]$. The upper bound is attained iff all $s_i$ are equal; the lower bound is approached as the pre-softmax margin grows without bound.
-
-**Proof.** Upper bound: Jensen on $-\log$ or Lagrange multipliers (uniform maximizes entropy over the simplex). Lower bound: entropy is non-negative on any probability distribution, with $H(p) = 0$ iff $p$ is a point mass — which is a limit, not attained for finite $s$. $\blacksquare$
+**Proposition 2.4 (Entropy bounds).** For $p = \text{softmax}(s)$, $H(p) = -\sum_i p_i \log p_i \in [0, \log n]$. The upper bound is attained iff all $s_i$ are equal; the lower bound is approached as the pre-softmax margin grows without bound. *Upper: Jensen / Lagrange. Lower: entropy non-negative on any distribution.*
 
 **Proposition 2.5 (Saturation margin).** For $s = (0, \Delta, 0, \dots, 0) \in \mathbb{R}^n$ (winner at index 2 with margin $\Delta$), the winning probability is
 $$p_2 = \frac{e^\Delta}{e^\Delta + (n-1)} = \frac{1}{1 + (n-1) e^{-\Delta}}.$$
 To achieve $p_2 > 1 - \epsilon$ requires $\Delta > \log((n-1)/\epsilon)$ to leading order.
-
-**Proof.** Direct computation plus asymptotic inversion. $\blacksquare$
 
 **Corollary 2.5.1.** Margin requirements are *logarithmic* in $n$ — doubling the number of keys costs one additional nat of margin. This is why attention over long contexts is not hopeless despite the $n$-way competition; the cost to distinguish a clear winner from $n$ distractors grows only as $\log n$.
 
@@ -67,7 +59,7 @@ To achieve $p_2 > 1 - \epsilon$ requires $\Delta > \log((n-1)/\epsilon)$ to lead
 (b) $\max_i s_i \le \text{LSE}(s) \le \max_i s_i + \log n$;
 (c) $\text{LSE}$ is convex.
 
-**Proof.** (a) $\partial_{s_i} \text{LSE} = e^{s_i} / \sum_j e^{s_j} = p_i$. (b) Take $m = \max_i s_i$; then $e^m \le \sum_i e^{s_i} \le n e^m$; take logs. (c) Second derivative is the softmax Jacobian, which is PSD (it is the covariance of a categorical distribution — see Exercise 2.5). $\blacksquare$
+*Sketches: (a) direct $\partial_{s_i} \text{LSE} = p_i$. (b) sandwich $e^m \le \sum_i e^{s_i} \le n e^m$. (c) Hessian is the softmax Jacobian, which is PSD as the covariance of the categorical $p$ — Exercise 2.1.*
 
 **Proposition 2.7 (Temperature as inverse logit scaling).** $\text{softmax}_T(s) = \text{softmax}(s/T)$. Therefore the $1/\sqrt{d_k}$ factor in attention corresponds to effective temperature $T_{\text{eff}} = \sqrt{d_k}$.
 

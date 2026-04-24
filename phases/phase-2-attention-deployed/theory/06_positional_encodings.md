@@ -40,7 +40,7 @@ The input to the first layer is $x_i + p_i$.
 $$R_\omega(i - j) = \begin{pmatrix} \cos(\omega(i-j)) & -\sin(\omega(i-j)) \\ \sin(\omega(i-j)) & \cos(\omega(i-j)) \end{pmatrix}$$
 satisfies $(p_j^{(\omega)})^\top \cdot p_i^{(\omega)} = \cos(\omega(i - j))$, where $p_i^{(\omega)} = (\sin(\omega i), \cos(\omega i))$. So the inner product between sinusoidal encodings depends only on $i - j$.
 
-**Proof.** $\sin(\omega i) \sin(\omega j) + \cos(\omega i) \cos(\omega j) = \cos(\omega(i - j))$ by the angle-difference formula. $\blacksquare$
+*Sketch: angle-difference formula.*
 
 **Corollary 6.2.1.** In the absence of token content, attention score $s_{ij} = \langle p_i, p_j \rangle$ under sinusoidal encoding depends only on the offset $i - j$. This is the theoretical basis for claiming sinusoidal APE is "almost relative" — but only in the purely-positional limit; mixing in token content breaks the pure offset dependence.
 

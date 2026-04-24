@@ -42,15 +42,11 @@ Equivalently: a strictly upper-triangular matrix of $-\infty$'s with zeros elsew
 
 **Proposition 4.2 (Causal equivalence).** With causal mask $M^{\text{causal}}$, the attention at position $i$ is
 $$A_{i, j} = \begin{cases} \dfrac{e^{s_{ij}}}{\sum_{j' \le i} e^{s_{ij'}}} & j \le i \\ 0 & j > i, \end{cases}$$
-where $s_{ij}$ is the scaled score. Equivalently, $A_{i, 1:i}$ equals $\text{softmax}(s_{i, 1:i})$ and $A_{i, i+1:n} = 0$.
-
-**Proof.** $e^{-\infty} = 0$ under the usual convention. The normalizer therefore sums only over $j \le i$. The $e^{s_{ij}}/Z_i$ entries are standard softmax on the sub-row. $\blacksquare$
+where $s_{ij}$ is the scaled score. Equivalently, $A_{i, 1:i}$ equals $\text{softmax}(s_{i, 1:i})$ and $A_{i, i+1:n} = 0$. *Sketch: $e^{-\infty} = 0$, so the normalizer sums only over $j \le i$.*
 
 **Corollary 4.2.1 (Temporal locality).** The output row $\mathbf{o}_i$ depends only on $\{Q_i, K_{1:i}, V_{1:i}\}$ — the full sequence's future is computationally irrelevant.
 
-**Proposition 4.3 (KV-cache equivalence).** Let the model be trained with causal masking. At inference with KV-cache, step $t$ produces $\mathbf{o}_t = \text{softmax}(\mathbf{q}_t K_{1:t}^\top / \sqrt{d_k}) V_{1:t}$. This equals the $t$-th row of $\text{MaskedAttention}(Q_{1:t}, K_{1:t}, V_{1:t}; M^{\text{causal}})$ exactly — no approximation.
-
-**Proof.** By Corollary 4.2.1, the $t$-th row depends only on $Q_t, K_{1:t}, V_{1:t}$. KV-caching reuses the exact same $K_{1:t}, V_{1:t}$. Row indexing of the full attention matrix gives the same output. $\blacksquare$
+**Proposition 4.3 (KV-cache equivalence).** Let the model be trained with causal masking. At inference with KV-cache, step $t$ produces $\mathbf{o}_t = \text{softmax}(\mathbf{q}_t K_{1:t}^\top / \sqrt{d_k}) V_{1:t}$. This equals the $t$-th row of $\text{MaskedAttention}(Q_{1:t}, K_{1:t}, V_{1:t}; M^{\text{causal}})$ exactly — no approximation. *Direct from Corollary 4.2.1: the cache stores exactly the $K_{1:t}, V_{1:t}$ that the row would otherwise read.*
 
 **Corollary 4.3.1 (FLOPs and memory).** Generating a sequence of length $n$ with KV-cache costs $O(\sum_{t=1}^n t \cdot d_k) = O(n^2 d_k)$ FLOPs per layer per head for attention, with $O(n (d_k + d_v))$ peak memory. Without KV-cache (recomputing $K, V$ each step) it would cost $O(n^3 d_k)$ FLOPs.
 

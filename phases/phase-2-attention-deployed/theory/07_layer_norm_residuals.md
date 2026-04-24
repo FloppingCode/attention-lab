@@ -37,13 +37,9 @@ The difference is structural and load-bearing. **Pre-norm is dramatically more s
 $$\text{LN}(x) = \gamma \odot \frac{x - \mu(x) \mathbf{1}}{\sqrt{\sigma^2(x) + \epsilon}} + \beta,$$
 with $\gamma, \beta \in \mathbb{R}^d$ learned and $\epsilon > 0$ a small numerical-stability constant.
 
-**Proposition 7.2 (LN invariances).** Layer norm is invariant to (a) shifts in the input $x \to x + c \mathbf{1}$ for any scalar $c$, and (b) positive rescalings $x \to \lambda x$ for $\lambda > 0$ when $\beta = 0$. (When $\beta \ne 0$, scale-invariance is broken at the affine output.)
+**Proposition 7.2 (LN invariances).** Layer norm is invariant to (a) shifts in the input $x \to x + c \mathbf{1}$, and (b) positive rescalings $x \to \lambda x$ for $\lambda > 0$ when $\beta = 0$. (When $\beta \ne 0$, scale-invariance is broken at the affine output.) *Sketch: a constant shift cancels in centering; a positive rescaling cancels in $\sqrt{\sigma^2}$.*
 
-**Proof.** Shift: $x + c \mathbf{1}$ has mean $\mu(x) + c$ and the same variance, so $(x + c\mathbf{1}) - (\mu(x) + c) \mathbf{1} = x - \mu(x) \mathbf{1}$. Rescale: $\lambda x$ has mean $\lambda \mu(x)$ and variance $\lambda^2 \sigma^2(x)$, so the normalization recovers the same unit vector. $\beta$ then adds a fixed translation that is unaffected by the input. $\blacksquare$
-
-**Proposition 7.3 (Residual gradient flow).** For a stack of $L$ residual blocks $x_{\ell+1} = x_\ell + f_\ell(x_\ell)$, the gradient of the loss $\mathcal{L}$ with respect to $x_0$ contains a term $\partial \mathcal{L} / \partial x_L$ — i.e., a *direct* gradient path from output to input independent of the depth $L$. Combined with the chain-rule terms from the $f_\ell$'s, this prevents the vanishing-gradient pathology of plain feed-forward stacks.
-
-**Proof.** $\partial x_{\ell+1} / \partial x_\ell = I + \partial f_\ell / \partial x_\ell$. By the chain rule, $\partial \mathcal{L} / \partial x_0 = \prod_{\ell=0}^{L-1} (I + J_\ell) \cdot \partial \mathcal{L} / \partial x_L$, where $J_\ell = \partial f_\ell / \partial x_\ell$. Expanding the product, the leading term (all $I$'s) is the identity — gradient passes through unchanged. Other terms are products of various $J_\ell$'s. As long as the $J_\ell$ are reasonable (not all near zero or all near $-I$), the gradient survives. $\blacksquare$
+**Proposition 7.3 (Residual gradient flow).** For a stack of $L$ residual blocks $x_{\ell+1} = x_\ell + f_\ell(x_\ell)$, the chain-rule product is $\prod_\ell (I + J_\ell)$ rather than $\prod_\ell J_\ell$ — so the leading "all-$I$" term is the identity, providing a direct gradient path from output to input independent of $L$. This prevents the vanishing-gradient pathology of plain feed-forward stacks. *Sketch: $\partial x_{\ell+1} / \partial x_\ell = I + J_\ell$; expand the product.*
 
 **Empirical observation 7.4 (Pre-norm vs. post-norm stability).** Pre-norm transformers train stably without learning-rate warmup; post-norm transformers diverge without it, especially as depth grows. The reason is that the residual stream in post-norm passes through LN at every layer, repeatedly rescaling the gradient signal; in pre-norm, the residual stream is not normalized, so the gradient through the residual path is preserved exactly (Proposition 7.3 applies cleanly).
 
@@ -53,17 +49,13 @@ with $\gamma, \beta \in \mathbb{R}^d$ learned and $\epsilon > 0$ a small numeric
 $$\frac{\partial \text{LN}_i}{\partial x_j} = \frac{1}{\sigma(x)} \left[ \delta_{ij} - \frac{1}{d} - \frac{(x_i - \mu)(x_j - \mu)}{d \sigma^2(x)} \right].$$
 This Jacobian has rank $d - 2$: there are two null directions, the constant direction $\mathbf{1}$ (LN is shift-invariant) and the direction along $x - \mu \mathbf{1}$ (LN is scale-invariant per token).
 
-**Proof.** Direct computation. $\blacksquare$
+*Direct computation; Exercise 7.1 asks for the rank argument.*
 
 **Corollary 7.6.1.** Two degrees of freedom per token are killed by layer norm: the mean and the scale. Information in those directions is lost. This is intentional — LN's job is to remove scale and offset variability — but it is a real loss, and the residual connection compensates by carrying the un-normalized input forward.
 
-## 7.4 Numerical example — LN by hand on $d = 4$
+## 7.4 Numerical example
 
-Take $x = (1, 3, 5, 7)$. Then $\mu = 4$, $\sigma^2 = ((1-4)^2 + (3-4)^2 + (5-4)^2 + (7-4)^2)/4 = (9 + 1 + 1 + 9)/4 = 5$, $\sigma = \sqrt{5} \approx 2.236$. Centered: $(-3, -1, 1, 3)$. Normalized: $(-3, -1, 1, 3) / \sqrt{5} \approx (-1.342, -0.447, 0.447, 1.342)$.
-
-With $\gamma = \mathbf{1}, \beta = \mathbf{0}$ that is the LN output. Verify: mean $= 0$, variance $= 1$. ✓
-
-Now check shift invariance: $\text{LN}(x + 100) = \text{LN}(x)$ (Prop 7.2(a)). And rescaling: $\text{LN}(2 x) = \text{LN}(x)$ when $\beta = 0$ (Prop 7.2(b)). Both hold by direct computation.
+No separate hand example — centering and normalizing a 4-vector is grade-school arithmetic and reveals nothing the formula does not. The numerical content lives in the notebook: invariance checks, residual-vs-no-residual gradient flow at depth, and the pre-norm vs. post-norm trainability comparison at $L = 16$.
 
 ## 7.5 Mechanics check
 

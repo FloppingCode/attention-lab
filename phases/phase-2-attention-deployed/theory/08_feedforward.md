@@ -34,15 +34,13 @@ with $W_1 \in \mathbb{R}^{d_{\text{ff}} \times d_{\text{model}}}$, $W_2 \in \mat
 
 **Proposition 8.3 (FFN as universal per-token approximator).** For sufficiently wide $d_{\text{ff}}$, the FFN can approximate any continuous function $f: \mathbb{R}^{d_{\text{model}}} \to \mathbb{R}^{d_{\text{model}}}$ on a compact set to arbitrary accuracy, by the universal approximation theorem. Combined with attention (which mixes across positions), the transformer block is a universal approximator over sequences.
 
-**Proof sketch.** Universal approximation for one-hidden-layer MLPs with non-polynomial activations is classical (Cybenko, Hornik, Pinkus). The FFN is exactly such an MLP applied per token. $\blacksquare$
+*Cybenko / Hornik / Pinkus — universal approximation for one-hidden-layer MLPs with non-polynomial activations.*
 
 **Proposition 8.4 (FFN parameter and FLOP budget).** Vanilla FFN parameters: $2 \cdot d_{\text{model}} \cdot d_{\text{ff}}$ (ignoring biases). FLOPs per token: $4 \cdot d_{\text{model}} \cdot d_{\text{ff}}$ (forward; multiply for backward). Total per-block parameters: $4 d_{\text{model}}^2$ (attention) + $2 d_{\text{model}} d_{\text{ff}}$ (FFN). At $d_{\text{ff}} = 4 d_{\text{model}}$: FFN params = $8 d_{\text{model}}^2$, attention params = $4 d_{\text{model}}^2$. **The FFN is twice the parameter count of attention per block.**
 
 **Proposition 8.5 (FFN as key-value memory, formal version).** Write $W_1 = [k_1; \dots; k_{d_{\text{ff}}}]$ as rows (the "keys") and $W_2 = [v_1, \dots, v_{d_{\text{ff}}}]$ as columns (the "values"). Then
 $$\text{FFN}(x) = \sum_{i=1}^{d_{\text{ff}}} \phi(\langle k_i, x \rangle + b_{1,i}) \cdot v_i + b_2.$$
-Each hidden unit $i$ is a content-addressable "memory cell": its activation $\phi(\langle k_i, x \rangle + b_{1,i})$ is non-zero when $x$ matches key $k_i$, and the corresponding value $v_i$ is added to the output. The FFN is a sum of $d_{\text{ff}}$ such cells.
-
-**Proof.** Direct expansion. $\blacksquare$
+Each hidden unit $i$ is a content-addressable "memory cell": its activation $\phi(\langle k_i, x \rangle + b_{1,i})$ is non-zero when $x$ matches key $k_i$, and the corresponding value $v_i$ is added to the output. The FFN is a sum of $d_{\text{ff}}$ such cells. *Direct expansion of the matrix product.*
 
 **Empirical observation 8.6 (Hidden-unit specialization).** In trained transformers, individual FFN hidden units exhibit interpretable activation patterns: some fire on syntactic features, some on entity types, some on more abstract concepts. This is the basis of "neuron-level" mechanistic interpretability. Specialization is emergent, not enforced.
 

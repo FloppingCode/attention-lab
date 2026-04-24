@@ -40,7 +40,7 @@ with $W_O \in \mathbb{R}^{d_{\text{model}} \times d_{\text{model}}}$.
 
 **Proposition 5.3 (FLOP equivalence).** MHA with $h$ heads at dimension $d_h = d_{\text{model}} / h$ and single-head attention at dimension $d_{\text{model}}$ have the same asymptotic FLOP count $O(n^2 d_{\text{model}} + n d_{\text{model}}^2)$ (attention + projection costs). The constant factors differ slightly due to the split/concat reshapes but not asymptotically.
 
-**Proof.** Attention cost per head: $O(n^2 d_h)$ for $QK^\top$, $O(n^2 d_h)$ for $AV$. Summed over $h$ heads: $O(n^2 h d_h) = O(n^2 d_{\text{model}})$. Projection cost: $O(n d_{\text{model}} \cdot d_h)$ per head, summed $O(n d_{\text{model}}^2)$. Plus $W_O$: $O(n d_{\text{model}}^2)$. Total $O(n^2 d_{\text{model}} + n d_{\text{model}}^2)$. Single-head at $d_{\text{model}}$: same. $\blacksquare$
+*Sketch: per head $O(n^2 d_h)$ attention + $O(n d_{\text{model}} d_h)$ projection; summing over $h$ heads turns each $d_h$ into $d_{\text{model}}$.*
 
 **Empirical observation 5.4 (Head specialization).** In trained transformers, heads exhibit distinct attention patterns: some attend to the previous token (distance-1 heads), some to the first token (sink heads, Ch. 16), some to grammatically-linked tokens (subject-verb heads), some copy from matching context (induction heads, Ch. 15). This specialization is not enforced by architecture and can be disrupted by pruning or re-initialization. It is the primary reason multi-head beats single-head in practice.
 

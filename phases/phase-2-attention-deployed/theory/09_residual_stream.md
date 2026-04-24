@@ -36,7 +36,7 @@ with $a^{(\ell)}_t = \text{Attn}_\ell(\text{LN}(r^{(\ell)}))_t$ and $m^{(\ell)}_
 $$r^{(L)}_t = r^{(0)}_t + \sum_{\ell=0}^{L-1} a^{(\ell)}_t + \sum_{\ell=0}^{L-1} m^{(\ell)}_t.$$
 The final residual stream is the sum of the input embedding and the contributions of every attention and FFN block.
 
-**Proof.** Induction on $\ell$. $\blacksquare$
+*Induction on $\ell$.*
 
 **Corollary 9.2.1 (Per-component contribution).** For any analysis tool $\Phi$ that is linear in $r^{(L)}_t$ (e.g., the unembedding $W_U$, a linear probe), $\Phi(r^{(L)}_t)$ decomposes additively over the $2L + 1$ components — embedding, $L$ attention blocks, $L$ FFN blocks.
 
@@ -48,17 +48,9 @@ The final residual stream is the sum of the input embedding and the contribution
 
 **Empirical observation 9.6 (Norm growth).** $\|r^{(\ell)}_t\|$ grows monotonically with $\ell$ in pre-norm transformers (already seen in Ch. 7 Empirical obs 7.5). The growth is approximately $O(\sqrt{L})$ at init under random-walk arguments, faster after training.
 
-## 9.4 Numerical example — building a 4-layer toy stack
+## 9.4 Numerical example
 
-Take $d_{\text{model}} = 4$, $L = 4$ blocks, all blocks initialized with small random $W$'s. Given input $r^{(0)} = (1, 0, 0, 0)$:
-
-- After block 0: $r^{(1)} = r^{(0)} + a^{(0)} + m^{(0)}$ with $a^{(0)}, m^{(0)}$ small (random init). Approximately $r^{(1)} \approx r^{(0)}$.
-- After block 1: another small additive perturbation.
-- After block 4: $r^{(4)} \approx r^{(0)} + \text{small perturbation}$, but the perturbation has accumulated $O(\sqrt{L})$ in norm.
-
-The key observation: $r^{(L)}$ is close to $r^{(0)}$ at init. The model doesn't transform inputs; it *adds* corrections. Training adjusts those corrections to be useful.
-
-After training: each $a^{(\ell)}$ and $m^{(\ell)}$ has learned a specific function — write a previous-token copy here, write a syntactic feature there, etc. The residual stream becomes a structured composition of these contributions.
+No separate hand example — the residual-stream picture is geometric and the interesting numbers come from running the notebook (logit lens across depth, layer ablation, contribution norms). The chapter's content is the structural decomposition (Prop 9.2) plus the empirical observations 9.4–9.6, all of which are verified in the notebook.
 
 ## 9.5 Mechanics check
 
