@@ -1,38 +1,58 @@
 # attention-lab
 
-A learning repo for building deep, rigorous understanding of attention mechanisms through **theory + experiments**.
+Staged curriculum from attention mechanics to flow matching and diffusion on manifolds. Theory documents and executable notebooks, governed by an explicit pedagogy contract.
 
-Two parallel tracks:
+## Governing documents
 
-- **`theory/`** — assignment-style documents. Definitions, theorems, proofs, and exercises. Work them with pen and paper (or markdown).
-- **`notebooks/`** — experimental Jupyter notebooks. Implement, visualize, perturb, and learn by playing.
+- [`LEARNING_SPEC.md`](./LEARNING_SPEC.md) — pedagogy contract. Chapter structure, exercise standard, notebook conventions, content style. Read first.
+- [`CURRICULUM.md`](./CURRICULUM.md) — the full 8-phase, 34-chapter map with dependencies. Read second.
 
-Every theory chapter has a matching notebook. Do the theory first; then the notebook should feel like confirmation, not revelation.
+The `AI-applied-math-tutor` skill (global, `~/.claude/skills/AI-applied-math-tutor/`) supplies the learner profile and default pedagogy. The spec overrides where they differ.
 
-## How to use this repo
+## Tracks
 
-1. Read the theory chapter end-to-end.
-2. Do the exercises *before* looking at anything else. Check your work against the solution notes.
-3. Open the matching notebook. Run it cell by cell. Change parameters. Break it.
-4. Write 2–3 sentences in `learnings.md` about what surprised you.
+- **`theory/`** — chapter documents. Each declares a type and an ordering mode in its header:
+  - **Type.** `theory-only` (markdown, inline numerics), `theory + notebook` (paired), `experiment-led` (the notebook is the lesson).
+  - **Ordering.** `theory-first` (read chapter, predict, then run), `notebook-first` (run, be surprised, then read), `mixed`.
+- **`notebooks/`** — real `.ipynb` files. Open with Jupyter or VS Code. Every notebook follows QHMPC / F: **Question, Hypothesis, Method, Prediction, Confidence** at the top; **Finding** at the bottom.
+- **`learnings.md`** — rolling log: `YYYY-MM-DD · [chapter/notebook] · 2–3 sentences on what surprised, clicked, or got updated`.
 
-Do not skip exercises. The plots are easy; the derivations are where understanding forms.
+Exercises ship without solutions — the reader works them.
 
-## Curriculum
+## How to work a chapter
 
-| # | Theory | Notebook | Core question |
-|---|--------|----------|---------------|
-| 0 | [Linear algebra primer](theory/00_linear_algebra_primer.md) | — | Are your prereqs solid? |
-| 1 | [Scaled dot-product attention](theory/01_scaled_dot_product.md) | [01_attention_by_hand.ipynb](notebooks/01_attention_by_hand.ipynb) | What is Q·Kᵀ actually measuring? |
-| 2 | [Softmax & temperature](theory/02_softmax.md) | 02_softmax_temperature.ipynb | How does softmax concentrate mass? |
-| 3 | [Why √dₖ?](theory/03_why_sqrt_dk.md) | 03_variance_scaling.ipynb | Why does unscaled attention saturate? |
-| 4 | Multi-head attention | 04_heads_specialize.ipynb | Do heads learn different things? |
-| 5 | Positional encodings | 05_positional_bakeoff.ipynb | Which encodings extrapolate? |
-| 6 | Induction heads | 06_induction_heads.ipynb | Can you watch a circuit form? |
-| 7 | Attention sinks | 07_attention_sinks.ipynb | Why does token 0 hoard attention? |
-| 8 | Logit lens & patching | 08_logit_lens.ipynb | How do predictions refine by layer? |
+1. Read the chapter header — note its type and ordering.
+2. If theory-first: read end-to-end, do the exercises, write predictions (§X.7) **before opening the notebook**.
+3. If notebook-first: open the notebook, state a naive hypothesis in the QHMPC block, run, be surprised, then read the chapter.
+4. Check your predictions against the Findings in the notebook.
+5. Append 2–3 sentences to `learnings.md`.
 
-Chapters 4+ are stubs — we'll fill them as you progress.
+## Curriculum overview
+
+Full map in [`CURRICULUM.md`](./CURRICULUM.md). Summary by phase:
+
+| Phase | Top-level question | Chapters | Status |
+|---|---|---|---|
+| **0** Conventions | What notation does this repo use? | 0 | new |
+| **I** Attention mechanics | What is one attention computation doing? | 1–3 | complete |
+| **II** Transformer internals | How do the pieces compose into a block? | 4–9 | mix of stubs and new |
+| **III** Training dynamics | How do you read a loss curve and design an ablation? | 10–14 | new (experiment-led) |
+| **IV** Interpretability | How do you see a trained circuit? | 15–17 | stubs (experiment-led) |
+| **V** Bridge to generation | How does a transformer define a distribution? | 18–20 | new |
+| **VI** Flow matching and diffusion | The research layer. | 21–28 | new |
+| **VII** Geometric / manifold-valued | Attention and generation on manifolds. | 29–34 | new (research-frontier) |
+
+**Chapter markers.** `✓` complete · `◐` drafted, audit pending · `stub` placeholder · `new` not yet written · `cut` removed.
+
+## Phase I — existing files
+
+| # | Theory | Notebook | Status |
+|---|---|---|---|
+| 1 | [Scaled dot-product attention](theory/01_scaled_dot_product.md) | [01_attention_by_hand.ipynb](notebooks/01_attention_by_hand.ipynb) | ✓ |
+| 2 | [Softmax & temperature](theory/02_softmax.md) | [02_softmax_temperature.ipynb](notebooks/02_softmax_temperature.ipynb) | ✓ |
+| 3 | [Why $\sqrt{d_k}$?](theory/03_why_sqrt_dk.md) | [03_variance_scaling.ipynb](notebooks/03_variance_scaling.ipynb) | ✓ |
+
+Chapters 4+ are tracked in `CURRICULUM.md`. Written on demand in dependency order.
 
 ## Setup
 
@@ -40,11 +60,9 @@ Chapters 4+ are stubs — we'll fill them as you progress.
 cd ~/attention-lab
 uv venv
 uv pip install -e ".[dev]"
-uv run jupyter lab   # or open notebooks in VS Code
+uv run jupyter lab       # or open .ipynb files directly in VS Code
 ```
 
-## Conventions
+## Cut from earlier scaffold
 
-- Every notebook starts with a markdown cell: **Question**, **Hypothesis**, **Method**.
-- Every notebook ends with a markdown cell: **Finding** (2–3 sentences).
-- Copy findings into `learnings.md` with date + notebook link.
+- `theory/00_linear_algebra_primer.md` — **cut.** The reader has measure-theoretic / functional-analytic fluency; a primer is inappropriate. Replaced by Phase 0 "Conventions & notation" (see `CURRICULUM.md`).

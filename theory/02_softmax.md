@@ -1,68 +1,152 @@
-# Chapter 2 — Softmax and Temperature
+# Chapter 2 — Softmax and temperature
+
+```
+Type: theory + notebook
+Ordering: theory-first
+Depends on: 1 (scaled dot-product attention)
+```
 
 ## 2.1 Motivation
 
-Attention scores $s_{ij}$ are arbitrary real numbers. We need to convert them into a probability distribution: non-negative, summing to one, **differentiable** w.r.t. the scores, and preserving the *ordering* of the scores. Softmax is the canonical solution.
+Attention scores $s_{ij}$ are arbitrary reals. To turn them into usable attention weights we need a map $\mathbb{R}^n \to \Delta^{n-1}$ (the probability simplex) that is non-negative, sum-to-one, differentiable, monotone in each coordinate, and — ideally — the *exponential-family* canonical link. Softmax satisfies all of these and is the unique such map up to scaling. Its shape parameter, *temperature*, controls how selectively attention concentrates. Understanding softmax deeply is understanding attention's information-retrieval dynamics.
 
-## 2.2 Definition
+## 2.2 Storyline
 
-**Definition 2.1 (Softmax).** For $\mathbf{s} \in \mathbb{R}^n$,
-$$\text{softmax}(\mathbf{s})_i = \frac{e^{s_i}}{\sum_{j=1}^{n} e^{s_j}}.$$
+Softmax does one job with four useful consequences.
 
-**Definition 2.2 (Softmax with temperature $T > 0$).**
-$$\text{softmax}_T(\mathbf{s})_i = \frac{e^{s_i / T}}{\sum_j e^{s_j / T}}.$$
+**The job.** Given logits $s \in \mathbb{R}^n$, softmax emits the Gibbs distribution $p_i = e^{s_i/T} / Z$ on $\{1, \dots, n\}$, with temperature $T > 0$ controlling concentration.
 
-As $T \to 0^+$, softmax approaches a one-hot (hard argmax). As $T \to \infty$, it approaches uniform.
+**Useful consequence 1: shift invariance.** Adding a constant to every logit leaves the distribution unchanged. This is why the standard numerical implementation subtracts $\max_i s_i$ before exponentiating — it prevents overflow without affecting the answer.
 
-## 2.3 Core properties
+**Useful consequence 2: smoothness.** Softmax is $C^\infty$, with a clean Jacobian $\partial p_i / \partial s_j = p_i(\delta_{ij} - p_j) / T$. This enables gradient flow to the upstream $Q, K$ projections. Its failure at saturation (Lemma 3.3 preview) is the central reason scaling matters.
 
-**Proposition 2.1 (Shift invariance).** For any constant $c$, $\text{softmax}(\mathbf{s} + c\mathbf{1}) = \text{softmax}(\mathbf{s})$.
+**Useful consequence 3: temperature controls entropy.** As $T \to 0^+$, softmax approaches a one-hot at $\arg\max s$; as $T \to \infty$, it approaches uniform. The entropy of $p$ is a smooth monotone function of $T$ for fixed $s$. This is the mechanism's information-control knob.
 
-*Proof.* $e^{s_i + c} / \sum_j e^{s_j + c} = e^c e^{s_i} / (e^c \sum_j e^{s_j}) = \text{softmax}(\mathbf{s})_i$. ∎
+**Useful consequence 4: log-sum-exp as a soft max.** $\text{LSE}(s) = \log \sum_i e^{s_i}$ is a smooth upper bound on $\max_i s_i$, and $\nabla \text{LSE} = \text{softmax}$. This is why "softmax" is called that — it is the gradient of a smooth-max function.
 
-*Practical consequence.* Subtracting $\max_i s_i$ before exponentiating is safe and prevents overflow. This is how softmax is implemented in practice.
+**Temperature in attention.** In scaled dot-product attention the $1/\sqrt{d_k}$ factor is exactly an effective temperature: $\text{softmax}(QK^\top / \sqrt{d_k}) = \text{softmax}_{\sqrt{d_k}}(QK^\top)$. Chapter 3 derives why this particular temperature is the right one; Chapter 2 is the tool-building that makes Chapter 3 possible.
 
-**Proposition 2.2 (Jacobian).** Let $\mathbf{p} = \text{softmax}(\mathbf{s})$. Then
-$$\frac{\partial p_i}{\partial s_j} = p_i (\delta_{ij} - p_j),$$
-where $\delta_{ij}$ is the Kronecker delta.
+**Regime notes.** Softmax itself is stateless — no train / val / inference asymmetry in the operator. Temperature, however, can differ across regimes:
+- Training uses whatever temperature is built into the architecture (typically $\sqrt{d_k}$ for attention, $1$ for the output layer).
+- **Inference-time sampling** from a language model often uses a *different* temperature (sampling temperature) on the output softmax — concentrating or broadening the next-token distribution independently of how the model was trained. This is a *post-training* knob.
+- Masking (causal or attention masks) is applied additively to the *pre-softmax* scores, usually by adding $-\infty$ to disallowed positions, producing zero weight there after softmax.
 
-**Proposition 2.3 (Entropy bounds).** For $\mathbf{p} = \text{softmax}(\mathbf{s})$,
-$$0 \le H(\mathbf{p}) = -\sum_i p_i \log p_i \le \log n.$$
-The upper bound is achieved iff all $s_i$ are equal (uniform distribution). The lower bound is approached as one $s_i$ becomes much larger than the rest.
+## 2.3 Rigorous core
 
-## 2.4 Temperature as information control
+**Definition 2.1 (Softmax with temperature).** For $s \in \mathbb{R}^n$ and $T > 0$,
+$$\text{softmax}_T(s)_i = \frac{e^{s_i / T}}{\sum_{j=1}^n e^{s_j / T}}.$$
+We write $\text{softmax}(s) := \text{softmax}_1(s)$ for the unit-temperature default.
 
-Think of temperature as controlling **how confidently** attention concentrates:
+**Proposition 2.2 (Shift invariance).** For any $c \in \mathbb{R}$, $\text{softmax}_T(s + c \mathbf{1}) = \text{softmax}_T(s)$.
 
-- Low $T$ → sharp distribution → selective retrieval, low entropy.
-- High $T$ → flat distribution → averaging over many sources, high entropy.
+**Proof.** $e^{(s_i + c)/T} = e^{c/T} e^{s_i/T}$; the constant factors out of both numerator and normalizer. $\blacksquare$
 
-When you see "attention saturates" or "attention becomes one-hot," the underlying cause is always that the effective pre-softmax scores have large magnitude. Scaling (Chapter 3) is temperature control in disguise.
+**Proposition 2.3 (Jacobian).** Let $p = \text{softmax}(s)$. Then
+$$\frac{\partial p_i}{\partial s_j} = p_i(\delta_{ij} - p_j).$$
+For $\text{softmax}_T$, the Jacobian is $\tfrac{1}{T} p_i(\delta_{ij} - p_j)$.
 
-**Proposition 2.4.** $\text{softmax}(\mathbf{s}/T) = \text{softmax}(\mathbf{s})$ with an effective temperature of $T$ — equivalently, dividing the *logits* by $T$ and dividing the *scores* by $T$ are the same operation. In attention, the $1/\sqrt{d_k}$ scaling is a temperature of $\sqrt{d_k}$.
+**Proof.** For $i = j$: $\partial_{s_i} (e^{s_i}/Z) = e^{s_i}/Z - e^{s_i} e^{s_i}/Z^2 = p_i - p_i^2 = p_i(1 - p_i)$. For $i \ne j$: $\partial_{s_j} (e^{s_i}/Z) = -e^{s_i} e^{s_j}/Z^2 = -p_i p_j$. Combine. The temperature rescaling is chain rule on $s \mapsto s/T$. $\blacksquare$
 
-## 2.5 Exercises
+**Corollary 2.3.1 (Mass conservation).** The columns and rows of the Jacobian each sum to zero: $\sum_i \partial p_i / \partial s_j = 0$. *Why:* softmax maps to the simplex, so $\sum_i p_i = 1$ is constant; any perturbation in $s_j$ preserves this, meaning mass leaving one $p_i$ enters others in equal total amount.
 
-**2.1 ★** Compute $\text{softmax}((1, 2, 3))$ by hand (to 3 decimals). Then compute $\text{softmax}((101, 102, 103))$. Do they match? Which proposition did you just verify?
+**Proposition 2.4 (Entropy bounds).** For $p = \text{softmax}(s)$, $H(p) = -\sum_i p_i \log p_i \in [0, \log n]$. The upper bound is attained iff all $s_i$ are equal; the lower bound is approached as the pre-softmax margin grows without bound.
 
-**2.2 ★** Show that $\sum_i \frac{\partial p_i}{\partial s_j} = 0$ for all $j$. Interpret: what does this say about how "probability mass" responds to a perturbation in one logit?
+**Proof.** Upper bound: Jensen on $-\log$ or Lagrange multipliers (uniform maximizes entropy over the simplex). Lower bound: entropy is non-negative on any probability distribution, with $H(p) = 0$ iff $p$ is a point mass — which is a limit, not attained for finite $s$. $\blacksquare$
 
-**2.3 ★★ (Prove Proposition 2.2.)** Use the quotient rule. Case-split on $i = j$ vs $i \ne j$.
+**Proposition 2.5 (Saturation margin).** For $s = (0, \Delta, 0, \dots, 0) \in \mathbb{R}^n$ (winner at index 2 with margin $\Delta$), the winning probability is
+$$p_2 = \frac{e^\Delta}{e^\Delta + (n-1)} = \frac{1}{1 + (n-1) e^{-\Delta}}.$$
+To achieve $p_2 > 1 - \epsilon$ requires $\Delta > \log((n-1)/\epsilon)$ to leading order.
 
-**2.4 ★★ (Prove Proposition 2.3.)** Upper bound: use Jensen's inequality applied to $-\log$, or Lagrange multipliers to maximize entropy subject to $\sum p_i = 1$. Lower bound: entropy is non-negative for any probability distribution — why?
+**Proof.** Direct computation plus asymptotic inversion. $\blacksquare$
 
-**2.5 ★★** Let $\mathbf{s} = (0, \Delta, 0, 0, \dots, 0) \in \mathbb{R}^n$. Derive a closed form for $p_1 = \text{softmax}(\mathbf{s})_1$ (the "winning" entry) as a function of $\Delta$ and $n$. Plot (mentally or on paper) $p_1$ against $\Delta$ for $n = 10, 100, 1000$. What does this say about how much margin a "correct" token needs to win in long-context attention?
+**Corollary 2.5.1.** Margin requirements are *logarithmic* in $n$ — doubling the number of keys costs one additional nat of margin. This is why attention over long contexts is not hopeless despite the $n$-way competition; the cost to distinguish a clear winner from $n$ distractors grows only as $\log n$.
 
-**2.6 ★★★** Define the **log-sum-exp** function $\text{LSE}(\mathbf{s}) = \log \sum_i e^{s_i}$. Show:
-(a) $\nabla \text{LSE}(\mathbf{s}) = \text{softmax}(\mathbf{s})$.
-(b) $\max_i s_i \le \text{LSE}(\mathbf{s}) \le \max_i s_i + \log n$.
-This is why LSE is called a "soft max" — it is a smooth upper bound on the hard max.
+**Proposition 2.6 (Log-sum-exp).** Let $\text{LSE}(s) = \log \sum_i e^{s_i}$. Then:
 
-**2.7 ★★★** In attention, if we replace $\text{softmax}$ with a hard argmax, gradients vanish almost everywhere. Argue why. Then: name at least two ways the literature has tried to get discrete-selection attention while preserving gradients (e.g., Gumbel-softmax, straight-through estimators). You don't need to prove they work — just name and sketch.
+(a) $\nabla \text{LSE}(s) = \text{softmax}(s)$;
+(b) $\max_i s_i \le \text{LSE}(s) \le \max_i s_i + \log n$;
+(c) $\text{LSE}$ is convex.
 
-## 2.6 Before the notebook (`02_softmax_temperature.ipynb`)
+**Proof.** (a) $\partial_{s_i} \text{LSE} = e^{s_i} / \sum_j e^{s_j} = p_i$. (b) Take $m = \max_i s_i$; then $e^m \le \sum_i e^{s_i} \le n e^m$; take logs. (c) Second derivative is the softmax Jacobian, which is PSD (it is the covariance of a categorical distribution — see Exercise 2.5). $\blacksquare$
 
-Predict:
+**Proposition 2.7 (Temperature as inverse logit scaling).** $\text{softmax}_T(s) = \text{softmax}(s/T)$. Therefore the $1/\sqrt{d_k}$ factor in attention corresponds to effective temperature $T_{\text{eff}} = \sqrt{d_k}$.
 
-1. A plot of entropy $H(\text{softmax}(\mathbf{s}/T))$ as $T$ ranges over $[0.01, 100]$ for a fixed random $\mathbf{s} \in \mathbb{R}^{50}$. Sketch it. Where is it high/low?
-2. For random $\mathbf{s} \sim \mathcal{N}(0, \sigma^2 I_{n})$, how should the expected entropy of $\text{softmax}(\mathbf{s})$ depend on $\sigma$ and $n$? Which limit (large $\sigma$, large $n$) reduces entropy faster?
+## 2.4 Numerical example — shift invariance and saturation by hand
+
+**Shift invariance.** $\text{softmax}((1, 2, 3))$ vs. $\text{softmax}((101, 102, 103))$: identical. The second form overflows a naive implementation; subtracting $103$ first recovers the first form. Hand-computed:
+$$\text{softmax}((1, 2, 3)) = \frac{1}{e + e^2 + e^3} (e, e^2, e^3) \approx (0.090, 0.245, 0.665).$$
+
+**Saturation by margin.** For $n = 10$ and $\Delta \in \{1, 3, 5, 10\}$ the winning probability $p_{\text{win}} = e^\Delta / (e^\Delta + 9)$ is:
+
+| $\Delta$ | $p_{\text{win}}$ |
+|---|---|
+| 1 | $\approx 0.252$ |
+| 3 | $\approx 0.691$ |
+| 5 | $\approx 0.943$ |
+| 10 | $\approx 0.9996$ |
+
+Margin $\Delta \approx \log(n / \epsilon)$ is where $p_{\text{win}}$ crosses $1 - \epsilon$: for $n = 10$, $\epsilon = 0.01$, that's $\Delta \approx 6.9$ — the table above brackets it.
+
+**LSE vs. max.** For the same vector $(0, 5, 0, 0, \dots, 0)$ with $n = 10$, $\max = 5$, $\text{LSE} = 5 + \log(1 + 9e^{-5}) \approx 5.061$. Tight at large margin, off by up to $\log n \approx 2.3$ at zero margin.
+
+## 2.5 Mechanics check
+
+- **Exponential** — converts any real vector to positive entries, enforcing non-negativity.
+- **Normalizer $Z = \sum_j e^{s_j}$** — enforces sum-to-one, turning a positive-valued map into a probability distribution.
+- **Shift-invariance** — makes the implementation numerically stable (subtract the max), and means softmax only cares about score *differences*, not absolute scales.
+- **Temperature $T$ (or equivalently, pre-softmax scaling)** — the *only* knob controlling concentration. Every selectivity argument in attention is ultimately a temperature argument.
+- **Not hard-max** — softmax's smoothness is what makes attention trainable (Prop 1.4 + Lemma 3.3). Argmax would give identical forward-pass semantics in the $T \to 0$ limit but zero gradient.
+- **Asymptotics at $T \to 0$ and $T \to \infty$** — one-hot and uniform respectively. The entire useful range of attention lives between these two extremes.
+
+## 2.6 Exercises
+
+**2.1 ★★** *[Mechanism dissection — variance of the categorical.]* Let $p = \text{softmax}(s)$ and let $X$ be the categorical random variable with $P(X = i) = p_i$. For any function $f: \{1, \dots, n\} \to \mathbb{R}$, compute $\text{Var}_p(f(X))$ in terms of $p$ and $f$. Show that the softmax Jacobian (Prop 2.3) is precisely the covariance matrix of the indicator vector $\mathbf{1}_X$ of this categorical. What does this say about the Jacobian's eigenvalues?
+
+**2.2 ★★** *[Failure-mode construction — temperature pathologies.]* Construct pre-softmax inputs $s^{(1)}, s^{(2)} \in \mathbb{R}^n$ such that:
+
+(a) at $T = 1$, $\text{softmax}(s^{(1)})$ and $\text{softmax}(s^{(2)})$ have the same top-1 probability, but at $T = 10$ they differ in top-1 by more than $0.1$;
+
+(b) the entropy of $\text{softmax}_T(s)$ is non-monotone in $T$ over some range.
+
+For (b), state whether non-monotonicity is even possible. Prove or disprove.
+
+**2.3 ★★★** *[Theorem about the optimization — LSE duality.]* Consider the variational characterization
+$$\text{LSE}(s) = \max_{p \in \Delta^{n-1}} \left\{ \langle p, s \rangle + H(p) \right\},$$
+where $\Delta^{n-1}$ is the probability simplex and $H(p) = -\sum_i p_i \log p_i$.
+
+(a) Prove the identity: show the maximizer is $p = \text{softmax}(s)$ and the maximum value is $\text{LSE}(s)$.
+
+(b) Generalize to temperature: express $T \cdot \text{LSE}(s/T)$ as a similar variational problem with the entropy term scaled appropriately. What does temperature correspond to in this dual picture?
+
+(c) Interpret the duality in attention: what is the "entropy-regularized" optimization that softmax attention is implicitly solving at each query position?
+
+**2.4 ★★★** *[Failure mode — hard attention and gradient estimators.]* A hard-attention layer selects one key per query via argmax instead of softmax. Gradients vanish almost everywhere (Prop 1.4 failure).
+
+(a) Sketch the Gumbel-softmax estimator: add Gumbel noise to the scores, softmax at temperature $T$, anneal $T$ toward zero during training. Why does this preserve gradients while approaching hard selection?
+
+(b) Sketch the straight-through estimator: forward pass is argmax; backward pass pretends the argmax was the identity map (or, more commonly, pretends it was softmax). Why is this *biased* in the gradient sense, and what is the bias? Name at least one failure mode in terms of training dynamics.
+
+(c) Compare: under what circumstances would you choose Gumbel-softmax over straight-through, and vice versa? What role does the scale of $n$ (number of keys) play?
+
+**2.5 ★★★** *[Cross-chapter combination — predict-then-verify.]* The notebook will compute softmax entropy of $\text{softmax}(\mathbf{s})$ for $\mathbf{s} \sim \mathcal{N}(0, \sigma^2 I_n)$ as a function of $(\sigma, n)$. Before running, predict:
+
+(a) for fixed $n$, entropy as a function of $\sigma$ — direction, asymptotes at $\sigma \to 0$ and $\sigma \to \infty$, inflection behavior;
+
+(b) for fixed $\sigma$, entropy as a function of $n$ — direction, scaling with $n$;
+
+(c) is there a combined $(\sigma, n)$-quantity that controls entropy? Conjecture one, defend it, and state what you expect to see in a heatmap of entropy over $(\sigma, n)$. *Hint: the score variance of a single element is $\sigma^2$; relate this to Prop 2.5.*
+
+State confidence per part with a one-line reason.
+
+## 2.7 Before the notebook (`02_softmax_temperature.ipynb`)
+
+Write down the following predictions *before* opening the notebook.
+
+1. **Shift invariance check.** Direction and expected numerical error of the difference $\text{softmax}((1, 2, 3)) - \text{softmax}((101, 102, 103))$ under the safe (max-subtracting) and naive (no subtraction) implementations.
+2. **Entropy vs. temperature.** Fix $s \sim \mathcal{N}(0, I_{50})$. Plot of $H(\text{softmax}_T(s))$ as $T$ ranges over $[0.01, 100]$ on a log-x axis. State the two asymptotes and the direction of the curve between them.
+3. **Saturation margin.** For $n = 10$ and target $p_{\text{win}} = 0.99$, predict $\Delta^\star$ and the closed-form dependence on $n$ (from Corollary 2.5.1).
+4. **Entropy heatmap over $(\sigma, n)$.** From Exercise 2.5(c): what combined quantity do you conjecture controls entropy? Predict the level-set shape of the entropy heatmap over $\log \sigma \times \log n$ — are level sets vertical, horizontal, or diagonal lines?
+5. **Jacobian PSD check.** Softmax Jacobian is a covariance matrix (Exercise 2.1). Predict: is it PSD or strictly PD? What is its rank?
+6. **LSE sandwich.** For $s \sim \mathcal{N}(0, I_n)$, predict the gap $\text{LSE}(s) - \max_i s_i$ as a function of $n$. Does it grow like $\log n$ (the worst-case bound) or something smaller?
+
+For each: direction, magnitude, confidence. The notebook will confirm or update each prediction.

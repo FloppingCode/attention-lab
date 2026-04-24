@@ -109,7 +109,7 @@ Inherit the skill's exercise taxonomy and difficulty calibration (★ routine / 
 
 Plug-and-chug drills, restatement-of-definition exercises, and filler problems do not belong. A chapter with weak exercises is not ready.
 
-Solutions live in `theory/solutions/` and should include *why each step is needed*, not just the step.
+**No solutions in this repo.** Exercises ship without solution files or inline answers. The reader works problems themselves. If the reader asks for a solution to a specific exercise in conversation, answer there — do not commit solutions to the repo.
 
 ## 4. Content style (repo-specific)
 
