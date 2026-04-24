@@ -8,7 +8,7 @@ Full curriculum in [`../CURRICULUM.md`](../CURRICULUM.md).
 |---|---|---|
 | 0 | [phase-0-conventions](./phase-0-conventions/) | stub |
 | I | [phase-1-attention-mechanics](./phase-1-attention-mechanics/) | drafted (ch 1–3) |
-| II | [phase-2-attention-deployed](./phase-2-attention-deployed/) | empty |
+| II | [phase-2-attention-deployed](./phase-2-attention-deployed/) | drafted (ch 4–9) |
 | III | [phase-3-training-dynamics](./phase-3-training-dynamics/) | empty |
 | IV | [phase-4-interpretability](./phase-4-interpretability/) | empty |
 | V | [phase-5-generative-substrate](./phase-5-generative-substrate/) | empty |
