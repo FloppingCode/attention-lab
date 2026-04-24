@@ -96,12 +96,15 @@ State confidence per part.
 
 ## 8.7 Before the notebook (`08_ffn_capacity.ipynb`)
 
-Predictions to write down before opening.
+The notebook splits into two question types: (a) the **XOR experiment** that isolates per-token nonlinearity (attention-can't, FFN-can), and (b) a **width sweep** on a memorization task that isolates capacity. Predictions:
 
-1. **FFN as memory: hand example.** Build the $d_{\text{ff}} = 3, d_{\text{model}} = 2$ memory from §8.4 in code. Predict the output for inputs $(2, -1), (-1, 2), (-1, -1), (1, 1)$.
-2. **Parameter and FLOP count.** Vanilla FFN at $d_{\text{model}} = 768, d_{\text{ff}} = 3072$: predict params and FLOPs/token. Same for SwiGLU at matched FLOPs.
-3. **Capacity sweep on toy task.** Five widths, predict the accuracy curve. At what width does the model "click"?
-4. **FFN ablation.** Zero out the FFN (replace with identity); predict the accuracy drop on the toy task. Order of magnitude.
+1. **Parameter and FLOP count.** Vanilla FFN at $d_{\text{model}} = 768, d_{\text{ff}} = 3072$: params and FLOPs/token. Same for SwiGLU at matched FLOPs.
+2. **XOR — attention-only model.** A model with attention + linear out (no FFN) trained on per-token XOR: predict its accuracy ceiling. Justify from the linearity-in-embedding argument (§8.2). Will it reach above chance ($> 50\%$)? Why not?
+3. **XOR — FFN-only model.** A model with FFN + linear out (no attention) on the same task: predict its accuracy. How many hidden units does it need to express XOR? Connect to the $d_{\text{ff}} = 3$ memory example from §8.4.
+4. **Memorization width sweep.** On a $K = 5$ key-value recall task with vocabulary $V = 32$, predict where the model "clicks" — at $d_{\text{ff}}$ equal to what multiple of $V$ or $K$? Connect to Prop 8.5 (key-value memory cells).
+5. **Activation ablation.** GELU vs. ReLU vs. SiLU on the recall task: predict whether the difference is statistically meaningful or noise-level.
+
+For each: direction, magnitude, confidence.
 5. **Activation ablation.** GELU vs. ReLU vs. SiLU at fixed width: predict whether the difference is statistically meaningful or noise-level.
 
 For each: direction, magnitude, confidence.

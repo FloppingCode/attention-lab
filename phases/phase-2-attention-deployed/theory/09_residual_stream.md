@@ -99,12 +99,12 @@ State confidence per part.
 
 ## 9.7 Before the notebook (`09_residual_stream.ipynb`)
 
-Predictions to write down before opening.
+The notebook's core experiment is a **2-hop lookup task**: given a sequence of `(key, value)` pairs and a query `q`, the model must output `v_2 = lookup(lookup(q))` — the value of the value of the query. This is a task where depth has to do real work; the 1-hop intermediate `v_1 = lookup(q)` is a meaningful midway answer that the logit lens can detect separately. Predictions:
 
-1. **Telescoping decomposition.** For a 4-layer pre-norm transformer at init with random weights, predict $\|r^{(L)} - r^{(0)}\|$ vs. $L$. Linear in $L$? $\sqrt{L}$? Constant?
-2. **Per-component contribution norm.** Predict the relative magnitudes of $\|a^{(\ell)}\|$ vs. $\|m^{(\ell)}\|$ at init. Are they comparable?
-3. **Skip-connection survival.** After training, predict the $R^2$ of a linear probe predicting the input token from the final residual stream. Order of magnitude.
-4. **Logit-lens at each depth.** For a trained model, predict how next-token accuracy of the logit-lens prediction evolves with depth. Smooth monotone? Step jump? Late saturation?
-5. **Layer ablation.** Removing a single layer's contribution (zero out $a^{(\ell)} + m^{(\ell)}$): predict the accuracy drop as a function of which $\ell$ is removed. Which layer matters most?
+1. **Telescoping decomposition at init.** For a 4-layer pre-norm transformer, predict $\|r^{(L)} - r^{(0)}\|$ vs. $L$. Linear, $\sqrt{L}$, or constant?
+2. **Per-component contribution norm.** Predict relative magnitudes of $\|a^{(\ell)}\|$ vs. $\|m^{(\ell)}\|$ at init and after training. Are they comparable, or does training shift the balance?
+3. **2-hop training accuracy.** Can a 4-layer model solve the 2-hop task with random distractors? Predict final accuracy. (Chance is $1/V$.)
+4. **Logit-lens depth localization.** This is the key prediction. At each depth $\ell \in \{0, 1, 2, 3, 4\}$, predict (a) the accuracy of the lens-projected query prediction against the **1-hop intermediate** $v_1$, and (b) against the **2-hop answer** $v_2$. Sketch both curves. Where do they each peak? Does 1-hop accuracy precede 2-hop accuracy? Does 1-hop *decay* once 2-hop appears (which would weaken the "nothing is overwritten" mental model)?
+5. **Per-layer ablation.** Removing layer $\ell$'s contribution: which layers hurt the 1-hop most? The 2-hop most? Is there a clean assignment of "this layer does hop 1, this layer does hop 2," or is the computation distributed?
 
 For each: direction, magnitude, confidence.

@@ -97,12 +97,14 @@ State confidence per part.
 
 ## 5.7 Before the notebook (`05_heads_specialize.ipynb`)
 
-Write these predictions before opening the notebook.
+The notebook trains 1-, 2-, and 4-head models on a **two-channel retrieval task** designed so that one head cannot resolve both the channel routing and the within-channel key match. Write these predictions before opening:
 
-1. **Parameter count check.** Total parameters in MHA with $h = 1$ vs. $h = 8$ at $d_{\text{model}} = 128$. Same? Different? If same, why?
-2. **FLOP count scaling.** Same total FLOPs across $h \in \{1, 2, 4, 8\}$?
-3. **Toy-task specialization.** On the hand-crafted 5-token sequence from Ch. 1 experiment 4, replayed with $h = 2$ heads — does each head specialize to a different signal?
-4. **Rank of attention matrix.** For $h = 4$, $d_h = 8$, $n = 32$: pre-softmax score matrix rank (predict); post-softmax attention matrix rank (predict). Does softmax lift the rank?
-5. **Random-head ablation.** In a $h = 8$ MHA block with random initialization, ablating 4 of 8 heads should give roughly which fraction of the unperturbed output magnitude?
+1. **Parameter count.** Total parameters in MHA with $h = 1$ vs. $h = 8$ at $d_{\text{model}} = 128$. Same? Different? If same, why?
+2. **Rank of attention matrix.** For $h = 4$, $d_h = 8$, $n = 32$: pre-softmax score matrix rank, post-softmax attention matrix rank. Does softmax lift the rank?
+3. **Two-channel ceiling at $h = 1$.** Under the task design (model must route by channel AND match by key), what accuracy ceiling do you predict for $h = 1$? Justify mechanistically — what attention pattern would $h = 1$ have to produce, and why is that impossible to express with one head?
+4. **$h = 2$ specialization pattern.** If $h = 2$ saturates near 100%, what split between the two heads do you expect? (One per channel? One for routing + one for matching? Both heads doing both jobs in superposition?)
+5. **Per-channel head ablation.** With $h = 2$ trained, predict what ablating head 0 does to channel-A vs. channel-B accuracy. Symmetric? Channel-specific?
+
+For each: direction, magnitude, confidence with one-line reason.
 
 For each: direction, magnitude, confidence.
