@@ -1,0 +1,32 @@
+[project]
+name = "attn-lab"
+version = "0.0.1"
+description = "Attention mechanisms: theory + experiments"
+requires-python = ">=3.11"
+dependencies = [
+    "torch>=2.3",
+    "numpy>=1.26",
+    "matplotlib>=3.8",
+    "plotly>=5.20",
+    "pandas>=2.2",
+    "einops>=0.8",
+    "transformers>=4.40",
+    "transformer-lens>=2.0",
+    "datasets>=2.18",
+    "jupyter>=1.0",
+    "ipykernel>=6.29",
+    "jupytext>=1.16",
+]
+
+[project.optional-dependencies]
+dev = [
+    "nbstripout>=0.7",
+    "ruff>=0.4",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/attn_lab"]
