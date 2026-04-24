@@ -9,12 +9,19 @@ Staged curriculum from attention mechanics to flow matching and diffusion on man
 
 The `AI-applied-math-tutor` skill (global, `~/.claude/skills/AI-applied-math-tutor/`) supplies the learner profile and default pedagogy. The spec overrides where they differ.
 
-## Tracks
+## Layout
 
-- **`theory/`** — chapter documents. Each declares a type and an ordering mode in its header:
-  - **Type.** `theory-only` (markdown, inline numerics), `theory + notebook` (paired), `experiment-led` (the notebook is the lesson).
-  - **Ordering.** `theory-first` (read chapter, predict, then run), `notebook-first` (run, be surprised, then read), `mixed`.
-- **`notebooks/`** — real `.ipynb` files. Open with Jupyter or VS Code. Every notebook follows QHMPC / F: **Question, Hypothesis, Method, Prediction, Confidence** at the top; **Finding** at the bottom.
+All chapter content lives under [`phases/`](./phases/), one directory per curriculum phase:
+
+```
+phases/phase-<N>-<slug>/
+  README.md       # phase overview, chapter table, experiment hook
+  theory/         # chapter markdown files (when present)
+  notebooks/      # paired .ipynb files (when present)
+```
+
+- **Theory documents** declare a type (`theory-only`, `theory + notebook`, `experiment-led`) and ordering (`theory-first`, `notebook-first`, `mixed`) in their header.
+- **Notebooks** follow QHMPC / F: **Question, Hypothesis, Method, Prediction, Confidence** at the top; **Finding** at the bottom.
 - **`learnings.md`** — rolling log: `YYYY-MM-DD · [chapter/notebook] · 2–3 sentences on what surprised, clicked, or got updated`.
 
 Exercises ship without solutions — the reader works them.
@@ -48,11 +55,11 @@ Full map in [`CURRICULUM.md`](./CURRICULUM.md). Summary by phase:
 
 | # | Theory | Notebook | Status |
 |---|---|---|---|
-| 1 | [Scaled dot-product attention](theory/01_scaled_dot_product.md) | [01_attention_by_hand.ipynb](notebooks/01_attention_by_hand.ipynb) | ✓ |
-| 2 | [Softmax & temperature](theory/02_softmax.md) | [02_softmax_temperature.ipynb](notebooks/02_softmax_temperature.ipynb) | ✓ |
-| 3 | [Why $\sqrt{d_k}$?](theory/03_why_sqrt_dk.md) | [03_variance_scaling.ipynb](notebooks/03_variance_scaling.ipynb) | ✓ |
+| 1 | [Scaled dot-product attention](phases/phase-1-attention-mechanics/theory/01_scaled_dot_product.md) | [01_attention_by_hand.ipynb](phases/phase-1-attention-mechanics/notebooks/01_attention_by_hand.ipynb) | ✓ |
+| 2 | [Softmax & temperature](phases/phase-1-attention-mechanics/theory/02_softmax.md) | — | ✓ |
+| 3 | [Why $\sqrt{d_k}$?](phases/phase-1-attention-mechanics/theory/03_why_sqrt_dk.md) | [03_variance_scaling.ipynb](phases/phase-1-attention-mechanics/notebooks/03_variance_scaling.ipynb) | ✓ |
 
-Chapters 4+ are tracked in `CURRICULUM.md`. Written on demand in dependency order.
+Chapters 4+ are tracked in `CURRICULUM.md` and scaffolded as empty phase directories under [`phases/`](./phases/). Written on demand in dependency order.
 
 ## Setup
 
@@ -65,4 +72,4 @@ uv run jupyter lab       # or open .ipynb files directly in VS Code
 
 ## Cut from earlier scaffold
 
-- `theory/00_linear_algebra_primer.md` — **cut.** The reader has measure-theoretic / functional-analytic fluency; a primer is inappropriate. Replaced by Phase 0 "Conventions & notation" (see `CURRICULUM.md`).
+- `phases/phase-0-conventions/theory/00_linear_algebra_primer.md` — **cut.** The reader has measure-theoretic / functional-analytic fluency; a primer is inappropriate. Replaced by Phase 0 "Conventions & notation" (see `CURRICULUM.md`).
