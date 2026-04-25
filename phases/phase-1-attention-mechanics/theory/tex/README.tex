@@ -1,0 +1,130 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+  \setmainfont[]{DejaVu Serif}
+  \setmonofont[]{DejaVu Sans Mono}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{newunicodechar}
+\newunicodechar{★}{\ensuremath{\star}}
+\newunicodechar{✓}{\ensuremath{\checkmark}}
+\newunicodechar{√}{\ensuremath{\surd}}
+\newunicodechar{≈}{\ensuremath{\approx}}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  colorlinks=true,
+  linkcolor={Maroon},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+\author{}
+\date{}
+
+\begin{document}
+
+\hypertarget{theory-track}{%
+\section{Theory track}\label{theory-track}}
+
+Each chapter follows the same structure:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Motivation} --- why does this matter?
+\item
+  \textbf{Definitions} --- precise statements of objects we'll
+  manipulate.
+\item
+  \textbf{Derivations / theorems} --- the math, with proofs where short
+  enough to be illuminating.
+\item
+  \textbf{Worked example} --- a tiny numerical case you can verify by
+  hand.
+\item
+  \textbf{Exercises} --- numbered, with difficulty markers:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    ★ --- routine, should take \textless{} 5 min
+  \item
+    ★★ --- requires real thought, 10--30 min
+  \item
+    ★★★ --- open-ended or a small proof, 30+ min
+  \end{itemize}
+\item
+  \textbf{Before the notebook} --- a prediction you must write down
+  before running code.
+\end{enumerate}
+
+Do exercises in a paper notebook or a scratch markdown file. Solutions
+are in \texttt{theory/solutions/} --- resist until you've made a genuine
+attempt.
+
+\hypertarget{math-prerequisites}{%
+\subsection{Math prerequisites}\label{math-prerequisites}}
+
+\begin{itemize}
+\tightlist
+\item
+  Linear algebra: matrix multiplication, inner products,
+  eigendecomposition, norms.
+\item
+  Probability: discrete distributions, expectation, variance,
+  independence.
+\item
+  Calculus: partial derivatives, chain rule, gradient of scalar w.r.t.
+  vector.
+\end{itemize}
+
+If any of those feel shaky, start with
+\texttt{00\_linear\_algebra\_primer.md}.
+
+\end{document}

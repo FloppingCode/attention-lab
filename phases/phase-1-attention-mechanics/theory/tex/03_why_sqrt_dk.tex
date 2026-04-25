@@ -1,0 +1,379 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+  \setmainfont[]{DejaVu Serif}
+  \setmonofont[]{DejaVu Sans Mono}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\newenvironment{Shaded}{}{}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{#1}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.49,0.56,0.16}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.00,0.50,0.00}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.53,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.56,0.13,0.00}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.73,0.13,0.13}{\textit{#1}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.02,0.16,0.49}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.00,0.50,0.00}{\textbf{#1}}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.40,0.40,0.40}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.74,0.48,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.73,0.40,0.53}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.10,0.09,0.49}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{#1}}}}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{newunicodechar}
+\newunicodechar{★}{\ensuremath{\star}}
+\newunicodechar{✓}{\ensuremath{\checkmark}}
+\newunicodechar{√}{\ensuremath{\surd}}
+\newunicodechar{≈}{\ensuremath{\approx}}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  colorlinks=true,
+  linkcolor={Maroon},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+\author{}
+\date{}
+
+\begin{document}
+
+\hypertarget{chapter-3-why-sqrtd_k}{%
+\section{\texorpdfstring{Chapter 3 --- Why
+\(\sqrt{d_k}\)?}{Chapter 3 --- Why \textbackslash sqrt\{d\_k\}?}}\label{chapter-3-why-sqrtd_k}}
+
+\begin{verbatim}
+Type: theory + notebook
+Ordering: theory-first
+Depends on: 1 (scaled dot-product attention), 2 (softmax & temperature)
+\end{verbatim}
+
+\hypertarget{motivation}{%
+\subsection{3.1 Motivation}\label{motivation}}
+
+The scaling factor \(1/\sqrt{d_k}\) in scaled dot-product attention is
+not cosmetic. It is the factor that keeps pre-softmax scores of order
+one as the head dimension grows. Without it, softmax saturates at
+initialization and gradients die. Why \(\sqrt{d_k}\) specifically ---
+not \(d_k\), not \(\log d_k\), not a learned scalar --- is a variance
+argument followed by a gradient argument.
+
+\hypertarget{storyline}{%
+\subsection{3.2 Storyline}\label{storyline}}
+
+The mechanism is a three-link chain.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Variance in, variance out.} The inner product of two
+  independent random vectors with i.i.d. unit-variance entries has
+  variance equal to the dimension. Raw scores
+  \(s_{ij} = \langle q_i, k_j \rangle\) therefore have standard
+  deviation \(\sqrt{d_k}\), which grows unboundedly with head dimension.
+  For \(d_k = 128\), scores live on the scale of \(\pm 11\).
+\item
+  \textbf{Softmax concentrates under large inputs.} From Chapter 2,
+  softmax with a winner of margin \(\Delta\) gives
+  \(p_{\text{win}} = e^\Delta / (e^\Delta + (n-1))\); once
+  \(\Delta \gg \log(n-1)\), \(p_{\text{win}} \to 1\) and the
+  distribution is effectively one-hot. Large-scale inputs push softmax
+  into this saturated regime.
+\item
+  \textbf{Saturated softmax has zero Jacobian.}
+  \(\partial p_i / \partial s_j = p_i(\delta_{ij} - p_j)\). When \(p\)
+  is near one-hot every entry of this Jacobian is near zero. No gradient
+  flows back to \(Q, K\), so attention cannot learn.
+\end{enumerate}
+
+Dividing by \(\sqrt{d_k}\) rescales the first link so pre-softmax inputs
+have unit variance regardless of head dimension. Softmax then sees
+inputs of moderate magnitude and the gradient survives.
+
+\textbf{Regime notes.} The argument is sharpest \emph{at
+initialization}. After training, learned \(W_Q, W_K\) restructure the
+score distribution in ways the i.i.d. hypothesis does not capture (see
+§3.3, Empirical observation 3.4). Measured pre-softmax score variance in
+a trained model is typically below one even with the \(\sqrt{d_k}\)
+factor present; the factor's job is to keep \emph{early} training
+healthy, not to maintain unit variance throughout. The factor is a fixed
+constant --- no train / val / inference distinction, no interaction with
+dropout or masking.
+
+\hypertarget{rigorous-core}{%
+\subsection{3.3 Rigorous core}\label{rigorous-core}}
+
+\textbf{Lemma 3.1 (Variance of an inner product).} Let
+\(q, k \in \mathbb{R}^{d_k}\) have independent components \(q_i, k_i\)
+with \(\mathbb{E}[q_i] = \mathbb{E}[k_i] = 0\) and
+\(\text{Var}(q_i) = \text{Var}(k_i) = 1\), and \(q \perp k\) as random
+vectors. Then
+\[\mathbb{E}[\langle q, k \rangle] = 0, \qquad \text{Var}(\langle q, k \rangle) = d_k.\]
+\emph{Sketch: mean by independence; variance by independence across
+\(i\) and the factoring
+\(\mathbb{E}[q_i^2 k_i^2] = \mathbb{E}[q_i^2]\mathbb{E}[k_i^2] = 1\).
+Generalized in Exercise 3.1.}
+
+\textbf{Proposition 3.2 (The \(\sqrt{d_k}\) correction).} Under the
+hypotheses of Lemma 3.1,
+\(\text{Var}(\langle q, k \rangle / \sqrt{d_k}) = 1\).
+
+\textbf{Lemma 3.3 (Jacobian vanishing under saturation).} Let
+\(p = \text{softmax}(s)\) for \(s \in \mathbb{R}^n\). Let
+\(J_{ij} = \partial p_i / \partial s_j = p_i(\delta_{ij} - p_j)\). If
+\(p \to e_k\) (one-hot at index \(k\)), then \(\|J\|_F \to 0\).
+\emph{Sketch: case-split on \(i = k\) vs.~\(i \ne k\) --- every entry
+vanishes individually.}
+
+\textbf{Corollary 3.3.1.} Pre-softmax scores with standard deviation
+\(\sqrt{d_k}\) place softmax in the saturating regime (Chapter 2, §2.4);
+combined with Lemma 3.3, this means gradients at \(W_Q, W_K\) through an
+unscaled attention layer vanish in expectation as \(d_k \to \infty\) at
+initialization.
+
+\textbf{Empirical observation 3.4 (The i.i.d. hypothesis breaks
+post-training).} In a trained model the entries of \(q, k\) are not
+i.i.d. --- learned \(W_Q, W_K\) concentrate mass in specific directions
+dictated by the task. Pre-softmax score variance in trained attention is
+typically \emph{below} one even with the \(\sqrt{d_k}\) factor present.
+The scaling argument is sharp at init; after training it is
+conservative. This motivates alternatives like QK-norm (Exercise 3.3)
+that do not depend on the i.i.d. hypothesis.
+
+\hypertarget{numerical-example-variance-scaling-is-a-distributional-fact}{%
+\subsection{3.4 Numerical example --- variance scaling is a
+distributional
+fact}\label{numerical-example-variance-scaling-is-a-distributional-fact}}
+
+A single hand computation of \(\langle q, k \rangle\) for fixed \(q, k\)
+doesn't surface what Lemma 3.1 is saying --- the lemma is about the
+\emph{distribution} of the inner product across i.i.d. samples, not any
+particular value. The minimal experiment that reveals the mechanism is a
+Monte-Carlo estimate of the variance across \(d_k\):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{import}\NormalTok{ numpy }\ImportTok{as}\NormalTok{ np}
+
+\NormalTok{M }\OperatorTok{=} \DecValTok{100\_000}
+\ControlFlowTok{for}\NormalTok{ d\_k }\KeywordTok{in}\NormalTok{ [}\DecValTok{1}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{16}\NormalTok{, }\DecValTok{64}\NormalTok{, }\DecValTok{256}\NormalTok{, }\DecValTok{1024}\NormalTok{]:}
+\NormalTok{    q }\OperatorTok{=}\NormalTok{ np.random.randn(M, d\_k)}
+\NormalTok{    k }\OperatorTok{=}\NormalTok{ np.random.randn(M, d\_k)}
+\NormalTok{    s }\OperatorTok{=}\NormalTok{ np.}\BuiltInTok{sum}\NormalTok{(q }\OperatorTok{*}\NormalTok{ k, axis}\OperatorTok{=}\DecValTok{1}\NormalTok{)}
+    \BuiltInTok{print}\NormalTok{(}\SpecialStringTok{f"d\_k=}\SpecialCharTok{\{}\NormalTok{d\_k}\SpecialCharTok{:\textgreater{}5\}}\SpecialStringTok{  var(s) ≈ }\SpecialCharTok{\{}\NormalTok{s}\SpecialCharTok{.}\NormalTok{var()}\SpecialCharTok{:8.2f\}}\SpecialStringTok{   var(s/√d\_k) ≈ }\SpecialCharTok{\{}\NormalTok{(s }\OperatorTok{/}\NormalTok{ np.sqrt(d\_k))}\SpecialCharTok{.}\NormalTok{var()}\SpecialCharTok{:5.3f\}}\SpecialStringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Expected: the first column tracks \(d_k\) linearly, the second stays
+near \(1\). The notebook sweeps this across several random seeds and
+measures the full distribution, not just the variance.
+
+\hypertarget{mechanics-check}{%
+\subsection{3.5 Mechanics check}\label{mechanics-check}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Scale by \(1/\sqrt{d_k}\)} --- keeps pre-softmax score
+  variance at \(O(1)\) regardless of head dimension (Lemma 3.1 +
+  Proposition 3.2). Without this, softmax saturates at init and
+  gradients die.
+\item
+  \textbf{Why \(\sqrt{d_k}\), not \(d_k\)} --- we want \emph{standard
+  deviation} \(O(1)\), not variance \(O(1/d_k)\). Dividing by \(d_k\)
+  shrinks scores too hard and collapses softmax toward uniform
+  (temperature \(\to \infty\) in Chapter 2's sense), which is also
+  uninformative.
+\item
+  \textbf{Why not a learned scalar at init} --- a learned scalar is
+  initialized somewhere; starting far from \(1/\sqrt{d_k}\) creates the
+  saturation problem this factor is designed to prevent. Learned scalars
+  are a \emph{post-init} tool (see QK-norm, Exercise 3.3).
+\item
+  \textbf{Interaction with softmax, not with masking or dropout} --- the
+  factor sits between \(QK^\top\) and softmax; it does not interact with
+  the additive mask (which is applied to the scaled scores) or with
+  attention dropout (which is applied to the softmax output). No train /
+  val / inference asymmetry.
+\end{itemize}
+
+\hypertarget{exercises}{%
+\subsection{3.6 Exercises}\label{exercises}}
+
+\textbf{3.1 ★★} \emph{{[}Mechanism dissection --- general variances.{]}}
+Let entries of \(q, k\) be i.i.d. with
+\(\mathbb{E}[q_i] = \mathbb{E}[k_i] = 0\),
+\(\text{Var}(q_i) = \sigma_q^2\), \(\text{Var}(k_i) = \sigma_k^2\).
+Derive the scaling factor \(c(d_k, \sigma_q, \sigma_k)\) such that
+\(\langle q, k \rangle / c\) has unit variance. What does this say about
+the common convention of initializing both \(W_Q\) and \(W_K\) at the
+same scale?
+
+\textbf{3.2 ★★} \emph{{[}Failure-mode construction --- dependent \(q\)
+and \(k\).{]}} Suppose \(q = W_Q x\) and \(k = W_K x\) for the
+\emph{same} input \(x \in \mathbb{R}^d\), so \(q\) and \(k\) are not
+independent. Let \(x\) have i.i.d. unit-variance entries. Derive
+\(\text{Var}(\langle q, k \rangle)\) in terms of \(W_Q, W_K\). Does it
+still scale like \(d_k\)? Construct explicit \(W_Q, W_K\) for which the
+variance is \(\Theta(d_k^2)\) (much larger than \(d_k\)), and others for
+which it is \(O(1)\) (much smaller). What structural feature of
+\(W_Q^\top W_K\) controls the answer?
+
+\textbf{3.3 ★★★} \emph{{[}Theorem about the numerics --- QK-norm.{]}}
+QK-norm replaces \(QK^\top / \sqrt{d_k}\) with
+\(\gamma \cdot \hat Q \hat K^\top\), where
+\(\hat q_i = q_i / \|q_i\|_2\) row-wise (similarly \(\hat k_j\)), and
+\(\gamma \in \mathbb{R}\) is learned.
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\tightlist
+\item
+  Prove that \(\hat q^\top \hat k \in [-1, 1]\)
+  \emph{deterministically}, independent of any distributional assumption
+  on \(q, k\).
+\item
+  Conclude that pre-softmax scores are bounded by \(\pm \gamma\), and
+  contrast this with the \(\sqrt{d_k}\) guarantee (which is an
+  expectation, not a bound).
+\item
+  In Chapter 2's language, what quantity does \(\gamma\) play the role
+  of? State the analogy precisely.
+\item
+  Give one situation in which QK-norm is strictly more robust than
+  \(\sqrt{d_k}\)-scaling, and one in which it is strictly less
+  expressive.
+\end{enumerate}
+
+\textbf{3.4 ★★★} \emph{{[}Predict-then-verify --- unscaled attention
+across \(d_k\).{]}} The notebook will train a 1-layer transformer with
+\emph{unscaled} attention on a simple copy task, sweeping
+\(d_k \in \{4, 16, 64, 256\}\). For each \(d_k\), predict \emph{before
+running} which of the following occurs, and justify from Lemmas 3.1 and
+3.3 and Corollary 3.3.1:
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\tightlist
+\item
+  training loss fails to decrease at all (plateau at the init-entropy
+  floor);
+\item
+  training loss decreases slowly and converges to a worse optimum than
+  the scaled baseline;
+\item
+  training loss decreases normally (the unscaled model learns fine);
+\item
+  training loss diverges (blows up) after some number of steps.
+\end{enumerate}
+
+Write your prediction as a \(4 \times 4\) table (rows: \(d_k\), columns:
+outcomes (a)--(d), entries: your assigned probability summing to 1 per
+row) with a one-line reason per row. State your overall confidence (low
+/ medium / high, with reason).
+
+\hypertarget{before-the-notebook-03_variance_scaling.ipynb}{%
+\subsection{\texorpdfstring{3.7 Before the notebook
+(\texttt{03\_variance\_scaling.ipynb})}{3.7 Before the notebook (03\_variance\_scaling.ipynb)}}\label{before-the-notebook-03_variance_scaling.ipynb}}
+
+Write down the following predictions before opening the notebook. The
+notebook's purpose is to test them.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Empirical variance of unscaled scores} as a function of
+  \(d_k \in \{1, 4, 16, 64, 256, 1024\}\) --- shape, scaling exponent,
+  numeric values at \(d_k = 1\) and \(d_k = 1024\).
+\item
+  \textbf{Empirical variance of scaled scores} --- shape, scaling
+  exponent. State the expected deviation from 1 (concentration rate in
+  \(M\), the number of Monte-Carlo samples).
+\item
+  \textbf{Softmax entropy} of a single row as a function of \(d_k\), for
+  unscaled vs.~scaled inputs, with \(n = 32\) keys. State the limit of
+  each as \(d_k \to \infty\) in one word.
+\item
+  \textbf{Max / mean softmax ratio} in a single row, as a function of
+  \(d_k\), for unscaled vs.~scaled. Direction and limit.
+\item
+  \textbf{Frobenius norm of the softmax Jacobian} (evaluated at a random
+  score vector) as a function of \(d_k\), unscaled vs.~scaled. Direction
+  and the approximate rate of decay in the unscaled case (polynomial or
+  exponential in \(d_k\)?).
+\end{enumerate}
+
+For each prediction: direction, order-of-magnitude estimate, confidence
+level with a one-line reason. The notebook confirms or refutes each in
+its Finding section.
+
+\end{document}
